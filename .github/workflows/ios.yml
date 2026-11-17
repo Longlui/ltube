@@ -15,9 +15,14 @@ on:
 permissions:
   contents: write
 
+# Có lần build mới thì huỷ lần cũ đang chờ/đang chạy
+concurrency:
+  group: ios-build
+  cancel-in-progress: true
+
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 60
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
