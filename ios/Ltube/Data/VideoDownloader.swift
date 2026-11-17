@@ -59,14 +59,14 @@ final class VideoDownloader {
         return result.values.sorted { $0.height > $1.height }
     }
 
-    private nonisolated static func isH264(_ codec: VideoCodec?) -> Bool {
+    private nonisolated static func isH264(_ codec: YouTubeKit.VideoCodec?) -> Bool {
         switch codec {
         case .some(.avc1): return true
         default: return false
         }
     }
 
-    private nonisolated static func isAAC(_ codec: AudioCodec?) -> Bool {
+    private nonisolated static func isAAC(_ codec: YouTubeKit.AudioCodec?) -> Bool {
         switch codec {
         case .some(.mp4a): return true
         default: return false
