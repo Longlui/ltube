@@ -9,11 +9,12 @@
     ]
   },
   "ios": {
-    "build": 1,
-    "version": "0.2.0",
+    "build": 2,
+    "version": "0.3.0",
     "ipaUrl": "https://github.com/Longlui/ltube/releases/download/ios-latest/ltube.ipa",
     "notes": [
-      "Bản iOS đầu tiên"
+      "Tải video về máy thành file MP4 (có hình và tiếng), chọn 360p–1080p",
+      "Lưu vào Ảnh hoặc app Tệp › Trên iPhone › Ltube"
     ]
   },
   "topics": [
