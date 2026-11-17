@@ -136,6 +136,7 @@ struct PlayerScreen: View {
             LazyVStack(alignment: .leading, spacing: 10) {
                 Text(detail.summary.title).font(.title3.weight(.semibold))
                 MetaLine(video: detail.summary)
+                DownloadSection(videoID: detail.summary.id, title: detail.summary.title)
 
                 if let resumed = model.resumedFrom {
                     HStack {

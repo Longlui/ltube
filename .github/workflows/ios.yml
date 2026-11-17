@@ -28,6 +28,8 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Video dùng để thử phát trên giả lập
       TEST_VIDEO_ID: IITtXIlXp_U
+      # Video dùng để thử tải về MP4
+      DOWNLOAD_VIDEO_ID: dQw4w9WgXcQ
     steps:
       - uses: actions/checkout@v4
 
@@ -85,6 +87,23 @@ jobs:
           xcrun simctl launch "$UDID" com.giadinh.ltube -openVideo "${TEST_VIDEO_ID}"
           sleep 30
           xcrun simctl io "$UDID" screenshot out/4-resume.png
+
+          # 5. Thử tải về MP4 720p (ghép hình + tiếng), kiểm tra file có đủ hình và tiếng
+          xcrun simctl terminate "$UDID" com.giadinh.ltube || true
+          xcrun simctl launch "$UDID" com.giadinh.ltube -openVideo "${DOWNLOAD_VIDEO_ID}" -autoDownload 720
+          sleep 75
+          xcrun simctl io "$UDID" screenshot out/5-download.png
+          DOCS="$(xcrun simctl get_app_container "$UDID" com.giadinh.ltube data)/Documents"
+          ls -la "$DOCS" > out/download-files.txt 2>&1 || true
+          python3 - "$DOCS" > out/download-check.txt 2>&1 <<'PY' || true
+          import os, sys
+          d = sys.argv[1]
+          files = [f for f in os.listdir(d) if f.endswith('.mp4')] if os.path.isdir(d) else []
+          print('mp4 files:', files)
+          for f in files:
+              data = open(os.path.join(d, f), 'rb').read()
+              print(f, len(data), 'bytes | video(avc1):', b'avc1' in data, '| audio(mp4a):', b'mp4a' in data)
+          PY
 
           xcrun simctl spawn "$UDID" log show --last 10m --style compact \
             --predicate 'process == "Ltube"' > out/app.log 2>&1 || true

@@ -10,6 +10,7 @@ enum Route: Hashable {
 @main
 struct LtubeApp: App {
     @State private var history = HistoryStore()
+    @State private var downloader = VideoDownloader()
     @State private var path: [Route] = []
 
     init() {
@@ -31,6 +32,7 @@ struct LtubeApp: App {
                     }
             }
             .environment(history)
+            .environment(downloader)
             // Dùng khi chạy thử tự động: mở app với tham số "-openVideo <ID>"
             .task {
                 if let id = UserDefaults.standard.string(forKey: "openVideo"), path.isEmpty {

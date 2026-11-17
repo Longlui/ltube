@@ -12,8 +12,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.2.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "0.3.0"
+    CURRENT_PROJECT_VERSION: "2"
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Manual
 targets:
@@ -40,6 +40,10 @@ targets:
           - CFBundleURLName: com.giadinh.ltube
             CFBundleURLSchemes: [ltube]
         ITSAppUsesNonExemptEncryption: false
+        # Video đã tải hiện trong app Tệp › Trên iPhone › Ltube
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        NSPhotoLibraryAddUsageDescription: Ltube cần quyền để lưu video đã tải vào ứng dụng Ảnh.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.giadinh.ltube
