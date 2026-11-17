@@ -1,29 +1,54 @@
 {
   "latest": {
-    "versionCode": 2,
-    "versionName": "0.2.0",
+    "versionCode": 3,
+    "versionName": "0.3.0",
     "apkUrl": "https://github.com/Longlui/ltube/raw/main/ltube.apk",
     "notes": [
-      "Lưu lịch sử xem, xem tiếp từ chỗ đang dừng",
-      "Trang chủ có Đề xuất cho bạn, Thịnh hành, chủ đề",
-      "Video tiếp theo khi đang xem",
-      "Tự báo khi có bản mới"
+      "Tải video về máy thành file MP4 (có hình và tiếng), chọn chất lượng 144p–1080p",
+      "File lưu trong thư mục Download/Ltube, chép sang USB được"
     ]
   },
   "ios": {
     "build": 1,
     "version": "0.2.0",
     "ipaUrl": "https://github.com/Longlui/ltube/releases/download/ios-latest/ltube.ipa",
-    "notes": ["Bản iOS đầu tiên"]
+    "notes": [
+      "Bản iOS đầu tiên"
+    ]
   },
   "topics": [
-    { "name": "Âm nhạc", "query": "nhạc Việt hay nhất" },
-    { "name": "Bolero", "query": "nhạc bolero" },
-    { "name": "Hoạt hình", "query": "phim hoạt hình thiếu nhi" },
-    { "name": "Nấu ăn", "query": "dạy nấu ăn món ngon" },
-    { "name": "Tin tức", "query": "tin tức hôm nay" },
-    { "name": "Hài", "query": "hài hước" },
-    { "name": "Du lịch", "query": "du lịch Việt Nam" }
+    {
+      "name": "Âm nhạc",
+      "query": "nhạc Việt hay nhất"
+    },
+    {
+      "name": "Bolero",
+      "query": "nhạc bolero"
+    },
+    {
+      "name": "Hoạt hình",
+      "query": "phim hoạt hình thiếu nhi"
+    },
+    {
+      "name": "Nấu ăn",
+      "query": "dạy nấu ăn món ngon"
+    },
+    {
+      "name": "Tin tức",
+      "query": "tin tức hôm nay"
+    },
+    {
+      "name": "Hài",
+      "query": "hài hước"
+    },
+    {
+      "name": "Du lịch",
+      "query": "du lịch Việt Nam"
+    }
   ],
-  "trending": ["MUSIC", "LIVE", "MOVIES"]
+  "trending": [
+    "MUSIC",
+    "LIVE",
+    "MOVIES"
+  ]
 }

@@ -7,7 +7,7 @@ Cài đặt trên Android:
 2. Mở file `ltube.apk`, cho phép cài ứng dụng không rõ nguồn gốc.
 3. Nếu Play Protect cảnh báo, chọn "Vẫn cài đặt".
 
-Phiên bản hiện tại: 0.2.0
+Phiên bản hiện tại: 0.3.0 (Android)
 
 ## iPhone / iPad
 
