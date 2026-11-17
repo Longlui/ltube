@@ -10,6 +10,12 @@
       "Tự báo khi có bản mới"
     ]
   },
+  "ios": {
+    "build": 1,
+    "version": "0.2.0",
+    "ipaUrl": "https://github.com/Longlui/ltube/releases/download/ios-latest/ltube.ipa",
+    "notes": ["Bản iOS đầu tiên"]
+  },
   "topics": [
     { "name": "Âm nhạc", "query": "nhạc Việt hay nhất" },
     { "name": "Bolero", "query": "nhạc bolero" },
