@@ -1,0 +1,6 @@
+# Sinh ra khi build iOS
+ios/build/
+ios/*.xcodeproj/
+*.xcuserstate
+DerivedData/
+.DS_Store

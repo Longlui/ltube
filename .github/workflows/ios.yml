@@ -1,0 +1,115 @@
+# Build Ltube iOS trên máy macOS của GitHub (miễn phí cho repo công khai):
+#  1. Tạo dự án Xcode từ ios/project.yml (XcodeGen)
+#  2. Build cho giả lập, chạy thử trên giả lập iPhone và chụp màn hình
+#  3. Build file ltube.ipa CHƯA KÝ (ký bằng Sideloadly khi cài vào iPhone)
+#  4. Đăng ltube.ipa lên GitHub Releases (tag ios-latest)
+#  5. Đẩy ảnh chụp + log lên nhánh ci-output để kiểm tra từ máy Windows
+name: iOS build
+
+on:
+  push:
+    branches: [main]
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Video dùng để thử phát trên giả lập
+      TEST_VIDEO_ID: IITtXIlXp_U
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Chuẩn bị công cụ
+        run: |
+          mkdir -p out
+          xcodebuild -version | tee out/xcode-version.txt
+          brew install xcodegen
+          cd ios && xcodegen generate
+
+      - name: Build cho giả lập iOS
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/Ltube.xcodeproj -scheme Ltube -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath ios/build/sim CODE_SIGNING_ALLOWED=NO build \
+            2>&1 | tee out/sim-build.log | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
+          test -d ios/build/sim/Build/Products/Debug-iphonesimulator/Ltube.app
+
+      - name: Chạy thử trên giả lập iPhone
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          phones = [x for k, v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')]
+          print(phones[-1]['udid'])")
+          xcrun simctl list devices available | grep "$UDID" | tee out/simulator.txt
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" ios/build/sim/Build/Products/Debug-iphonesimulator/Ltube.app
+
+          # 1. Trang chủ lần đầu
+          xcrun simctl launch "$UDID" com.giadinh.ltube
+          sleep 45
+          xcrun simctl io "$UDID" screenshot out/1-home.png
+
+          # 2. Mở một video và xem 40 giây
+          xcrun simctl openurl "$UDID" "ltube://watch?v=${TEST_VIDEO_ID}"
+          sleep 40
+          xcrun simctl io "$UDID" screenshot out/2-player.png
+
+          # 3. Mở lại app: phải có "Xem tiếp" và "Đề xuất cho bạn"
+          xcrun simctl terminate "$UDID" com.giadinh.ltube || true
+          sleep 2
+          xcrun simctl launch "$UDID" com.giadinh.ltube
+          sleep 35
+          xcrun simctl io "$UDID" screenshot out/3-home-after.png
+
+          # 4. Mở lại video: phải phát tiếp từ chỗ dừng
+          xcrun simctl openurl "$UDID" "ltube://watch?v=${TEST_VIDEO_ID}"
+          sleep 30
+          xcrun simctl io "$UDID" screenshot out/4-resume.png
+
+          xcrun simctl spawn "$UDID" log show --last 10m --style compact \
+            --predicate 'process == "Ltube"' > out/app.log 2>&1 || true
+
+      - name: Build file ltube.ipa (chưa ký)
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/Ltube.xcodeproj -scheme Ltube -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath ios/build/device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build \
+            2>&1 | tee out/device-build.log | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
+          APP=ios/build/device/Build/Products/Release-iphoneos/Ltube.app
+          test -d "$APP"
+          mkdir -p ipa/Payload
+          cp -R "$APP" ipa/Payload/
+          (cd ipa && zip -qry ../ltube.ipa Payload)
+          ls -la ltube.ipa | tee out/ipa.txt
+
+      - name: Đăng lên GitHub Releases
+        run: |
+          gh release view ios-latest >/dev/null 2>&1 || \
+            gh release create ios-latest --title "Ltube iOS" \
+              --notes "Bản iOS chưa ký. Cài bằng Sideloadly (Apple ID miễn phí, gia hạn mỗi 7 ngày)." \
+              --latest=false
+          gh release upload ios-latest ltube.ipa --clobber
+          echo "https://github.com/${GITHUB_REPOSITORY}/releases/download/ios-latest/ltube.ipa" | tee out/ipa-url.txt
+
+      - name: Gửi ảnh chụp và log về nhánh ci-output
+        if: always()
+        run: |
+          cd out
+          echo "run ${GITHUB_RUN_NUMBER} - ${GITHUB_SHA} - $(date -u)" > run.txt
+          grep -hE "error:" sim-build.log device-build.log 2>/dev/null | sort -u > errors.txt || true
+          git init -q
+          git checkout -q -b ci-output
+          git add -A
+          git -c user.name="ci" -c user.email="ci@users.noreply.github.com" commit -qm "CI run ${GITHUB_RUN_NUMBER}"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ci-output
