@@ -11,6 +11,11 @@ on:
     branches: [main]
     paths: ["ios/**", ".github/workflows/ios.yml"]
   workflow_dispatch:
+    inputs:
+      run_tests:
+        description: "Chạy thử trên giả lập iPhone (chậm hơn ~5 phút)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -52,7 +57,11 @@ jobs:
           (cd ios/build/sim/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/ltube-simulator.zip" Ltube.app)
           ls -la ltube-simulator.zip
 
+      # Mặc định bỏ qua khi push để có file .ipa nhanh hơn.
+      # Muốn chạy thử: Actions › iOS build › Run workflow (tích "run_tests"),
+      # hoặc ghi "[test]" trong nội dung commit.
       - name: Chạy thử trên giả lập iPhone
+        if: inputs.run_tests || contains(github.event.head_commit.message, '[test]')
         run: |
           UDID=$(xcrun simctl list devices available -j | python3 -c "
           import json, sys
