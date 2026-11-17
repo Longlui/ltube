@@ -46,6 +46,9 @@ jobs:
             -derivedDataPath ios/build/sim CODE_SIGNING_ALLOWED=NO build \
             2>&1 | tee out/sim-build.log | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
           grep -q "BUILD SUCCEEDED" out/sim-build.log
+          # Gói bản build giả lập để chạy thử trên web (Appetize)
+          (cd ios/build/sim/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/ltube-simulator.zip" Ltube.app)
+          ls -la ltube-simulator.zip
 
       - name: Chạy thử trên giả lập iPhone
         run: |
@@ -104,7 +107,7 @@ jobs:
             gh release create ios-latest --title "Ltube iOS" \
               --notes "Bản iOS chưa ký. Cài bằng Sideloadly (Apple ID miễn phí, gia hạn mỗi 7 ngày)." \
               --latest=false
-          gh release upload ios-latest ltube.ipa --clobber
+          gh release upload ios-latest ltube.ipa ltube-simulator.zip --clobber
           echo "https://github.com/${GITHUB_REPOSITORY}/releases/download/ios-latest/ltube.ipa" | tee out/ipa-url.txt
 
       - name: Gửi ảnh chụp và log về nhánh ci-output
