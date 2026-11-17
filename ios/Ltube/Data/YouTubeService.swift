@@ -40,7 +40,6 @@ struct YouTubeService {
             .filter { $0.includesVideoAndAudioTrack && $0.isNativelyPlayable }
             .sorted { ($0.videoResolution ?? 0) > ($1.videoResolution ?? 0) }
         guard let best = candidates.first else { throw LtubeError.noPlayableStream }
-        try await best.waitUntilAvailable()
         return best.url
     }
 }
