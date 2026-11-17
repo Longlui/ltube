@@ -32,6 +32,14 @@ struct YouTubeService {
     /// Link phát: livestream dùng HLS; video thường dùng luồng có sẵn cả hình lẫn tiếng
     /// mà iPhone tự giải mã được, chọn độ phân giải cao nhất.
     func playbackURL(videoID: String) async throws -> URL {
+        do {
+            return try await findPlaybackURL(videoID: videoID)
+        } catch let error as YouTubeKitError {
+            throw LtubeError.youtube(error)
+        }
+    }
+
+    private func findPlaybackURL(videoID: String) async throws -> URL {
         let video = YouTube(videoID: videoID, methods: [.local])
         if let live = try? await video.livestreams.first(where: { $0.streamType == .hls }) {
             return live.url

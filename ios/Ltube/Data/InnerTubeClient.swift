@@ -132,12 +132,23 @@ enum LtubeError: LocalizedError {
     case http(Int)
     case badResponse
     case noPlayableStream
+    case youtube(Error)
 
     var errorDescription: String? {
         switch self {
         case .http(let code): return "YouTube trả lỗi \(code). Thử lại sau ít phút."
         case .badResponse: return "Dữ liệu YouTube không đọc được. Có thể cần cập nhật app."
-        case .noPlayableStream: return "Không tìm được luồng phát cho video này."
+        case .noPlayableStream: return "Video này chưa phát được trên iPhone. Thử video khác."
+        case .youtube(let error):
+            switch "\(error)" {
+            case "videoAgeRestricted": return "Video giới hạn độ tuổi, không xem được khi chưa đăng nhập."
+            case "videoPrivate": return "Video đã chuyển sang riêng tư."
+            case "videoUnavailable": return "Video không còn tồn tại."
+            case "membersOnly": return "Video chỉ dành cho hội viên của kênh."
+            case "videoRegionBlocked": return "Video bị chặn ở khu vực của bạn."
+            default:
+                return "Chưa lấy được video này (\(error)). Thử video khác; nếu video nào cũng lỗi thì cần cập nhật app."
+            }
         }
     }
 }
