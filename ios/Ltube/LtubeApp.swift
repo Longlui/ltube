@@ -31,6 +31,12 @@ struct LtubeApp: App {
                     }
             }
             .environment(history)
+            // Dùng khi chạy thử tự động: mở app với tham số "-openVideo <ID>"
+            .task {
+                if let id = UserDefaults.standard.string(forKey: "openVideo"), path.isEmpty {
+                    path = [.player(id)]
+                }
+            }
             .preferredColorScheme(.dark)
             .tint(.red)
             // Mở bằng link: ltube://watch?v=ID (dùng khi thử trên giả lập) hoặc link YouTube

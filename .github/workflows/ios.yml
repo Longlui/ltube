@@ -67,8 +67,9 @@ jobs:
           sleep 45
           xcrun simctl io "$UDID" screenshot out/1-home.png
 
-          # 2. Mở một video và xem 40 giây
-          xcrun simctl openurl "$UDID" "ltube://watch?v=${TEST_VIDEO_ID}"
+          # 2. Mở một video và xem 40 giây (tham số khởi động, tránh hộp thoại "Open in Ltube?")
+          xcrun simctl terminate "$UDID" com.giadinh.ltube || true
+          xcrun simctl launch "$UDID" com.giadinh.ltube -openVideo "${TEST_VIDEO_ID}"
           sleep 40
           xcrun simctl io "$UDID" screenshot out/2-player.png
 
@@ -80,7 +81,8 @@ jobs:
           xcrun simctl io "$UDID" screenshot out/3-home-after.png
 
           # 4. Mở lại video: phải phát tiếp từ chỗ dừng
-          xcrun simctl openurl "$UDID" "ltube://watch?v=${TEST_VIDEO_ID}"
+          xcrun simctl terminate "$UDID" com.giadinh.ltube || true
+          xcrun simctl launch "$UDID" com.giadinh.ltube -openVideo "${TEST_VIDEO_ID}"
           sleep 30
           xcrun simctl io "$UDID" screenshot out/4-resume.png
 
